@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -26,7 +27,10 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       body: FutureBuilder(
-        future: getHomePageContent(),
+        future: request(
+          'homePageContent',
+          formData: {'lon': '115.02932', 'lat': '35.76189'},
+        ),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var data = json.decode(snapshot.data.toString());
@@ -45,6 +49,14 @@ class _HomePageState extends State<HomePage>
             //
             List<Map> recommendList =
                 (data['data']['recommend'] as List).cast();
+
+            String floorTitle1 = data['data']['floor1Pic']['PICTURE_ADDRESS'];
+            String floorTitle2 = data['data']['floor2Pic']['PICTURE_ADDRESS'];
+            String floorTitle3 = data['data']['floor3Pic']['PICTURE_ADDRESS'];
+
+            List<Map> floor1 = (data['data']['floor1'] as List).cast();
+            List<Map> floor2 = (data['data']['floor2'] as List).cast();
+            List<Map> floor3 = (data['data']['floor3'] as List).cast();
 
             return SingleChildScrollView(
               child: Column(
@@ -65,6 +77,25 @@ class _HomePageState extends State<HomePage>
                   Recommend(
                     recommendList: recommendList,
                   ),
+                  FloorTitle(
+                    pictureAddress: floorTitle1,
+                  ),
+                  FloorContent(
+                    floorGoodsList: floor1,
+                  ),
+                  FloorTitle(
+                    pictureAddress: floorTitle2,
+                  ),
+                  FloorContent(
+                    floorGoodsList: floor2,
+                  ),
+                  FloorTitle(
+                    pictureAddress: floorTitle3,
+                  ),
+                  FloorContent(
+                    floorGoodsList: floor3,
+                  ),
+                  HotGoods(),
                 ],
               ),
             );
@@ -300,6 +331,102 @@ class Recommend extends StatelessWidget {
           _titleWidget(),
           _recommentList(),
         ],
+      ),
+    );
+  }
+}
+
+// 楼层标题
+class FloorTitle extends StatelessWidget {
+  final String pictureAddress;
+  const FloorTitle({Key key, this.pictureAddress}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(8.0),
+      child: Image.network(
+        pictureAddress,
+      ),
+    );
+  }
+}
+
+// 楼层商品
+class FloorContent extends StatelessWidget {
+  final List floorGoodsList;
+  const FloorContent({Key key, this.floorGoodsList}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          _firstRow(),
+          _otherGoods(),
+        ],
+      ),
+    );
+  }
+
+  Widget _firstRow() {
+    return Row(
+      children: <Widget>[
+        _goodsItem(floorGoodsList[0]),
+        Column(
+          children: <Widget>[
+            _goodsItem(floorGoodsList[1]),
+            _goodsItem(floorGoodsList[2]),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _otherGoods() {
+    return Row(
+      children: <Widget>[
+        _goodsItem(floorGoodsList[3]),
+        _goodsItem(floorGoodsList[4]),
+      ],
+    );
+  }
+
+  Widget _goodsItem(Map goods) {
+    return Container(
+      width: ScreenUtil().setWidth(375),
+      child: InkWell(
+        onTap: () {},
+        child: Image.network(
+          goods['image'],
+        ),
+      ),
+    );
+  }
+}
+
+class HotGoods extends StatefulWidget {
+  @override
+  _HotGoodsState createState() => _HotGoodsState();
+}
+
+class _HotGoodsState extends State<HotGoods> {
+  @override
+  void initState() {
+    super.initState();
+    request(
+      'homePageBelowContent',
+      formData: 1,
+    ).then((val) {
+      print(val);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text(
+        '火爆专区',
       ),
     );
   }

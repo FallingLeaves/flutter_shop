@@ -25,3 +25,54 @@ Future getHomePageContent() async {
     return print('ERROR:===$e');
   }
 }
+
+// 获取首页火爆商品
+Future getHomePageBlewContent() async {
+  try {
+    print('开始获取首页火爆专区数据');
+    Response response;
+    Dio dio = new Dio();
+    dio.options.contentType =
+        ContentType.parse('application/x-www-form-urlencoded');
+
+    int page = 1;
+
+    response = await dio.post(servicePath['homePageBelowContent'], data: page);
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('后端接口异常');
+    }
+  } catch (e) {
+    return print('ERROR:===$e');
+  }
+}
+
+Future request(url, {formData}) async {
+  try {
+    print('开始获取数据');
+    Response response;
+    Dio dio = new Dio();
+    dio.options.contentType =
+        ContentType.parse('application/x-www-form-urlencoded');
+    if (formData == null) {
+      response = await dio.post(
+        servicePath[url],
+      );
+    } else {
+      response = await dio.post(
+        servicePath[url],
+        data: formData,
+      );
+    }
+
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception('后端接口异常');
+    }
+  } catch (e) {
+    return print('ERROR:===$e');
+  }
+}
