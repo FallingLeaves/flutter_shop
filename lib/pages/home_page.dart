@@ -4,6 +4,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'dart:convert';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -17,13 +18,15 @@ class _HomePageState extends State<HomePage>
   int page = 1;
   List<Map> hotGoodsList = [];
 
+  GlobalKey<RefreshFooterState> _footerkey =
+      new GlobalKey<RefreshFooterState>();
+
   @override
   bool get wantKeepAlive => true;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
-    _getHotGoods();
   }
 
   @override
@@ -38,7 +41,10 @@ class _HomePageState extends State<HomePage>
       body: FutureBuilder(
         future: request(
           'homePageContent',
-          formData: {'lon': '115.02932', 'lat': '35.76189'},
+          formData: {
+            'lon': '115.02932',
+            'lat': '35.76189',
+          },
         ),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -67,8 +73,18 @@ class _HomePageState extends State<HomePage>
             List<Map> floor2 = (data['data']['floor2'] as List).cast();
             List<Map> floor3 = (data['data']['floor3'] as List).cast();
 
-            return SingleChildScrollView(
-              child: Column(
+            return EasyRefresh(
+              refreshFooter: ClassicsFooter(
+                key: _footerkey,
+                bgColor: Colors.white,
+                textColor: Colors.pink,
+                moreInfoColor: Colors.pink,
+                showMore: true,
+                noMoreText: '',
+                moreInfo: '加载中',
+                loadReadyText: '上拉加载',
+              ),
+              child: ListView(
                 children: <Widget>[
                   SwiperDiy(
                     swiperDateList: swiper,
@@ -107,6 +123,25 @@ class _HomePageState extends State<HomePage>
                   _hotGoods()
                 ],
               ),
+              loadMore: () async {
+                print('开始加载更多');
+                var formData = {
+                  'page': page,
+                };
+
+                await request(
+                  'homePageBelowContent',
+                  formData: formData,
+                ).then((val) {
+                  var data = json.decode(val.toString());
+                  List<Map> newGoodsList = (data['data'] as List).cast();
+
+                  setState(() {
+                    hotGoodsList.addAll(newGoodsList);
+                    page++;
+                  });
+                });
+              },
             );
           } else {
             return Center(
@@ -118,25 +153,6 @@ class _HomePageState extends State<HomePage>
         },
       ),
     );
-  }
-
-  void _getHotGoods() {
-    var formData = {
-      'page': page,
-    };
-
-    request(
-      'homePageBelowContent',
-      formData: formData,
-    ).then((val) {
-      var data = json.decode(val.toString());
-      List<Map> newGoodsList = (data['data'] as List).cast();
-
-      setState(() {
-        hotGoodsList.addAll(newGoodsList);
-        page++;
-      });
-    });
   }
 
   Widget hotTitlt = Container(
@@ -291,6 +307,7 @@ class TopNavigator extends StatelessWidget {
       height: ScreenUtil().setWidth(320),
       padding: EdgeInsets.all(3.0),
       child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 5,
         padding: EdgeInsets.all(5.0),
         children: navigatorList.map((item) {

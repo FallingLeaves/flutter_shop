@@ -52,6 +52,7 @@ Future getHomePageBlewContent() async {
 Future request(url, {formData}) async {
   try {
     print('开始获取数据');
+    print(formData.toString());
     Response response;
     Dio dio = new Dio();
     dio.options.contentType =
