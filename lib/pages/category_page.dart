@@ -86,9 +86,9 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
           listIndex = index;
         });
         var childCategory = list[index].bxMallSubDto;
-        Provide.value<ChildCategory>(context).getChildCategory(childCategory);
-
         var categoryId = list[index].mallCategoryId;
+        Provide.value<ChildCategory>(context)
+            .getChildCategory(childCategory, categoryId);
 
         _getGoodsList(categoryId: categoryId);
       },
@@ -134,7 +134,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
       });
       // 首次右侧子类别为空问题
       Provide.value<ChildCategory>(context)
-          .getChildCategory(list[0].bxMallSubDto);
+          .getChildCategory(list[0].bxMallSubDto, list[0].mallCategoryId);
 
       var categoryId = list[listIndex].mallCategoryId;
 
@@ -164,6 +164,7 @@ class _LeftCategoryNavState extends State<LeftCategoryNav> {
   }
 }
 
+// 右侧子类
 class RightCategory extends StatefulWidget {
   @override
   _RightCategoryState createState() => _RightCategoryState();
@@ -190,7 +191,8 @@ class _RightCategoryState extends State<RightCategory> {
             scrollDirection: Axis.horizontal,
             itemCount: childCategory.childCategoryList.length,
             itemBuilder: (context, index) {
-              return _rightInkWell(childCategory.childCategoryList[index]);
+              return _rightInkWell(
+                  childCategory.childCategoryList[index], index);
             },
           ),
         );
@@ -198,9 +200,16 @@ class _RightCategoryState extends State<RightCategory> {
     );
   }
 
-  Widget _rightInkWell(BxMallSubDto item) {
+  Widget _rightInkWell(BxMallSubDto item, int index) {
+    bool isClick = false;
+    isClick = index == Provide.value<ChildCategory>(context).childIndex
+        ? true
+        : false;
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Provide.value<ChildCategory>(context).changeChildIndex(index, item.mallSubId);
+        _getGoodsList(item.mallSubId);
+      },
       child: Container(
         padding: EdgeInsets.fromLTRB(
           5.0,
@@ -212,10 +221,35 @@ class _RightCategoryState extends State<RightCategory> {
           item.mallSubName,
           style: TextStyle(
             fontSize: ScreenUtil().setSp(28),
+            color: isClick ? Colors.pink : Colors.black,
           ),
         ),
       ),
     );
+  }
+
+  void _getGoodsList(String categorySubId) async {
+    var data = {
+      'categoryId': Provide.value<ChildCategory>(context).categoryId,
+      'categorySubId': categorySubId,
+      'page': 1,
+    };
+
+    await request(
+      'getMallGoods',
+      formData: data,
+    ).then((val) {
+      var data = json.decode(val.toString());
+
+      CategoryGoodsListModel goodsList = CategoryGoodsListModel.fromJson(data);
+
+      if (goodsList.data == null) {
+        Provide.value<CategoryGoodsListProvide>(context).getGoodsList([]);
+      } else {
+        Provide.value<CategoryGoodsListProvide>(context)
+            .getGoodsList(goodsList.data);
+      }
+    });
   }
 }
 
@@ -235,16 +269,22 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
       builder: (context, child, data) {
-        return Container(
-          width: ScreenUtil().setWidth(570),
-          height: ScreenUtil().setHeight(980),
-          child: ListView.builder(
-            itemCount: data.goodsList.length,
-            itemBuilder: (context, index) {
-              return _listItem(data.goodsList, index);
-            },
-          ),
-        );
+        if (data.goodsList.length > 0) {
+          return Expanded(
+            child: Container(
+              width: ScreenUtil().setWidth(570),
+              // height: ScreenUtil().setHeight(980),
+              child: ListView.builder(
+                itemCount: data.goodsList.length,
+                itemBuilder: (context, index) {
+                  return _listItem(data.goodsList, index);
+                },
+              ),
+            ),
+          );
+        } else {
+          return Text('暂无数据');
+        }
       },
     );
   }
