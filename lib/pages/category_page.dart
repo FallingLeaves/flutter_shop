@@ -7,6 +7,8 @@ import '../model/categotyGoodsList.dart';
 import 'package:provide/provide.dart';
 import '../provide/child_category.dart';
 import '../provide/category_goods_list.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CategoryPage extends StatefulWidget {
   CategoryPage({Key key}) : super(key: key);
@@ -207,7 +209,8 @@ class _RightCategoryState extends State<RightCategory> {
         : false;
     return InkWell(
       onTap: () {
-        Provide.value<ChildCategory>(context).changeChildIndex(index, item.mallSubId);
+        Provide.value<ChildCategory>(context)
+            .changeChildIndex(index, item.mallSubId);
         _getGoodsList(item.mallSubId);
       },
       child: Container(
@@ -265,21 +268,51 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
     super.initState();
   }
 
+  GlobalKey<RefreshFooterState> _footerkey =
+      new GlobalKey<RefreshFooterState>();
+
+  var scrollContraler = new ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
       builder: (context, child, data) {
+        try {
+          if (Provide.value<ChildCategory>(context).page == 1) {
+            // 列表位置最上
+            scrollContraler.jumpTo(0.0);
+          }
+        } catch (e) {
+          print('第一次进入页面:$e');
+        }
         if (data.goodsList.length > 0) {
           return Expanded(
             child: Container(
               width: ScreenUtil().setWidth(570),
               // height: ScreenUtil().setHeight(980),
-              child: ListView.builder(
-                itemCount: data.goodsList.length,
-                itemBuilder: (context, index) {
-                  return _listItem(data.goodsList, index);
-                },
-              ),
+              child: EasyRefresh(
+                  refreshFooter: ClassicsFooter(
+                    key: _footerkey,
+                    bgColor: Colors.white,
+                    textColor: Colors.pink,
+                    moreInfoColor: Colors.pink,
+                    showMore: true,
+                    noMoreText:
+                        Provide.value<ChildCategory>(context).noMoreText,
+                    moreInfo: '加载中',
+                    loadReadyText: '上拉加载',
+                  ),
+                  child: ListView.builder(
+                    controller: scrollContraler,
+                    itemCount: data.goodsList.length,
+                    itemBuilder: (context, index) {
+                      return _listItem(data.goodsList, index);
+                    },
+                  ),
+                  loadMore: () async {
+                    print('上拉加载');
+                    _getMoreGoodsList();
+                  }),
             ),
           );
         } else {
@@ -287,6 +320,39 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
         }
       },
     );
+  }
+
+  void _getMoreGoodsList() async {
+    Provide.value<ChildCategory>(context).addPage();
+    var data = {
+      'categoryId': Provide.value<ChildCategory>(context).categoryId,
+      'categorySubId': Provide.value<ChildCategory>(context).subId,
+      'page': Provide.value<ChildCategory>(context).page,
+    };
+
+    await request(
+      'getMallGoods',
+      formData: data,
+    ).then((val) {
+      var data = json.decode(val.toString());
+
+      CategoryGoodsListModel goodsList = CategoryGoodsListModel.fromJson(data);
+
+      if (goodsList.data == null) {
+        Provide.value<ChildCategory>(context).changeNoMoreText('没有更多了!');
+        Fluttertoast.showToast(
+          msg: '已经到底了!',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.pink,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else {
+        Provide.value<CategoryGoodsListProvide>(context)
+            .getMoreGoodsList(goodsList.data);
+      }
+    });
   }
 
   Widget _goodsImage(List list, int index) {
@@ -320,21 +386,25 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
         top: 20.0,
         left: 5.0,
       ),
-      width: ScreenUtil().setWidth(340),
+      width: ScreenUtil().setWidth(350),
       child: Row(
         children: <Widget>[
-          Text(
-            '价格:￥${list[index].presentPrice}',
-            style: TextStyle(
-              fontSize: ScreenUtil().setSp(28),
-              color: Colors.pink,
+          Expanded(
+            child: Text(
+              '价格:￥${list[index].presentPrice}',
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(28),
+                color: Colors.pink,
+              ),
             ),
           ),
-          Text(
-            '价格:￥${list[index].oriPrice}',
-            style: TextStyle(
-              color: Colors.black26,
-              decoration: TextDecoration.lineThrough,
+          Expanded(
+            child: Text(
+              '价格:￥${list[index].oriPrice}',
+              style: TextStyle(
+                color: Colors.black26,
+                decoration: TextDecoration.lineThrough,
+              ),
             ),
           ),
         ],
