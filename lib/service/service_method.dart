@@ -70,6 +70,7 @@ Future request(url, {formData}) async {
     }
 
     if (response.statusCode == 200) {
+      print(response.data);
       return response.data;
     } else {
       throw Exception('后端接口异常');
