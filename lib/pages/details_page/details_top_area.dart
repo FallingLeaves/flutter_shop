@@ -35,14 +35,14 @@ class DetailsTopArea extends StatelessWidget {
   Widget _goodsImage(url) {
     return Image.network(
       url,
-      width: ScreenUtil().setWidth(740),
+      width: ScreenUtil().setWidth(750),
     );
   }
 
   // 商品名称
   Widget _goodsName(name) {
     return Container(
-      width: ScreenUtil().setWidth(720),
+      width: ScreenUtil().setWidth(750),
       padding: EdgeInsets.only(left: 15.0),
       child: Text(
         name,
@@ -55,7 +55,7 @@ class DetailsTopArea extends StatelessWidget {
   // 商品编号
   Widget _goodsNum(num) {
     return Container(
-      width: ScreenUtil().setWidth(720),
+      width: ScreenUtil().setWidth(750),
       padding: EdgeInsets.only(left: 15.0),
       margin: EdgeInsets.only(top: 8.0),
       child: Text(
