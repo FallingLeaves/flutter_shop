@@ -19,6 +19,9 @@ class DetailsWeb extends StatelessWidget {
         var isLeft = Provide.value<DetailsInfoProvide>(context).isLeft;
         if (isLeft) {
           return Container(
+            padding: EdgeInsets.only(
+              bottom: ScreenUtil().setHeight(80),
+            ),
             child: Html(
               data: goodsDetail,
             ),
@@ -26,7 +29,12 @@ class DetailsWeb extends StatelessWidget {
         } else {
           return Container(
             width: ScreenUtil().setWidth(750),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.fromLTRB(
+              10,
+              10,
+              10,
+              ScreenUtil().setHeight(80),
+            ),
             alignment: Alignment.center,
             child: Text(
               '暂时没有数据',

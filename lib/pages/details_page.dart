@@ -5,6 +5,7 @@ import './details_page/details_top_area.dart';
 import './details_page/details_explain.dart';
 import './details_page/details_tabbar.dart';
 import './details_page/detals_web.dart';
+import './details_page/details_bottom.dart';
 
 class DetailsPage extends StatelessWidget {
   final String goodsId;
@@ -40,9 +41,7 @@ class DetailsPage extends StatelessWidget {
                 Positioned(
                   bottom: 0,
                   left: 0,
-                  child: Text(
-                    '测试',
-                  ),
+                  child: DetailsBottom(),
                 ),
               ],
             );
