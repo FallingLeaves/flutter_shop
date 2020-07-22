@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provide/provide.dart';
 import '../provide/cart.dart';
 import './cart_page/cart_item.dart';
@@ -18,14 +17,19 @@ class CartPage extends StatelessWidget {
         future: _getCartInfo(context),
         builder: (context, snapshot) {
           List cartList = Provide.value<CartProvide>(context).cartList;
-          if (snapshot.hasData) {
+          if (snapshot.hasData && cartList != null) {
             return Stack(
               children: <Widget>[
-                ListView.builder(
-                  padding: EdgeInsets.only(bottom: 60.0),
-                  itemCount: cartList.length,
-                  itemBuilder: (context, index) {
-                    return CartItem(cartList[index]);
+                Provide<CartProvide>(
+                  builder: (context, child, childCategory) {
+                    cartList = Provide.value<CartProvide>(context).cartList;
+                    return ListView.builder(
+                      padding: EdgeInsets.only(bottom: 60.0),
+                      itemCount: cartList.length,
+                      itemBuilder: (context, index) {
+                        return CartItem(cartList[index]);
+                      },
+                    );
                   },
                 ),
                 Positioned(

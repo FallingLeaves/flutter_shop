@@ -51,9 +51,9 @@ Future getHomePageBlewContent() async {
 
 Future request(url, {formData}) async {
   try {
-    print('开始获取数据');
-    print(url);
-    print(formData.toString());
+    // print('开始获取数据');
+    // print(url);
+    // print(formData.toString());
     Response response;
     Dio dio = new Dio();
     dio.options.contentType =
@@ -70,7 +70,7 @@ Future request(url, {formData}) async {
     }
 
     if (response.statusCode == 200) {
-      print(response.data);
+      // print(response.data);
       return response.data;
     } else {
       throw Exception('后端接口异常');
