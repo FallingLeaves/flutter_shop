@@ -9,43 +9,41 @@ import './routers/routes.dart';
 import './routers/application.dart';
 import './provide/details_info.dart';
 import './provide/cart.dart';
+import './provide/currentIndex.dart';
 
 void main() {
   var counter = Counter();
   var providers = Providers();
   var childCategory = ChildCategory();
-  var categoryGoodsList = CategoryGoodsListProvide();
+  var categoryGoodsListProvide = CategoryGoodsListProvide();
   var detailsInfoProvide = DetailsInfoProvide();
   var cartProvide = CartProvide();
+  var currentIndexProvide = CurrentIndexProvide();
   providers
     ..provide(Provider<Counter>.value(counter))
     ..provide(Provider<ChildCategory>.value(childCategory))
     ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide))
-    ..provide(Provider<CategoryGoodsListProvide>.value(categoryGoodsList))
-    ..provide(Provider<CartProvide>.value(cartProvide));
-  runApp(
-    ProviderNode(
-      child: MyApp(),
-      providers: providers,
-    ),
-  );
+    ..provide(Provider<CartProvide>.value(cartProvide))
+    ..provide(Provider<CurrentIndexProvide>.value(currentIndexProvide))
+    ..provide(
+        Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide));
+
+  runApp(ProviderNode(child: MyApp(), providers: providers));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // 路由注册
     final router = Router();
     Routes.configureRoutes(router);
     Application.router = router;
 
     return Container(
       child: MaterialApp(
-        title: '百姓生活+',
-        debugShowCheckedModeBanner: false,
+        title: '百姓生活',
         onGenerateRoute: Application.router.generator,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: Colors.pink,
         ),

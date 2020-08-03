@@ -29,7 +29,9 @@ class CartCount extends StatelessWidget {
   // 减少按钮
   Widget _reduceBtn(context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Provide.value<CartProvide>(context).addOrReduceAction(item, 'reduce');
+      },
       child: Container(
         width: ScreenUtil().setWidth(45),
         height: ScreenUtil().setHeight(45),
@@ -39,7 +41,7 @@ class CartCount extends StatelessWidget {
           border: Border(
             right: BorderSide(
               width: 1,
-              color: Colors.black12,
+              color: item.count > 1 ? Colors.white : Colors.black12,
             ),
           ),
         ),
@@ -51,7 +53,9 @@ class CartCount extends StatelessWidget {
   // 添加按钮
   Widget _addBtn(context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Provide.value<CartProvide>(context).addOrReduceAction(item, 'add');
+      },
       child: Container(
         width: ScreenUtil().setWidth(45),
         height: ScreenUtil().setHeight(45),

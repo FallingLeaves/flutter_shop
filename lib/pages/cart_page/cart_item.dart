@@ -78,7 +78,7 @@ class CartItem extends StatelessWidget {
     return Container(
       width: ScreenUtil().setSp(300),
       padding: EdgeInsets.all(10),
-      alignment: Alignment.topLeft,
+      alignment: Alignment.center,
       child: Column(
         children: <Widget>[
           Text(item.goodsName),
