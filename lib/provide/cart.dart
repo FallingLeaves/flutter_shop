@@ -21,11 +21,17 @@ class CartProvide with ChangeNotifier {
     // 声明变量，判断是否已经存在该商品
     var isHave = false;
     int ival = 0;
+    allPrice = 0;
+    allGoodsCount = 0;
     tempList.forEach((item) {
       if (item['goodsId'] == goodsId) {
         tempList[ival]['count'] = item['count'] + 1;
         cartList[ival].count++;
         isHave = true;
+      }
+      if (item['isCheck']) {
+        allPrice += (cartList[ival].price * cartList[ival].count);
+        allGoodsCount += cartList[ival].count;
       }
       ival++;
     });
@@ -41,6 +47,8 @@ class CartProvide with ChangeNotifier {
       };
       tempList.add(newGoods);
       cartList.add(new CartInfoMode.fromJson(newGoods));
+      allPrice += (count * price);
+      allGoodsCount += count;
     }
     // 字符串encode
     cartString = json.encode(tempList).toString();

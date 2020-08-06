@@ -31,10 +31,8 @@ class IndexPage extends StatelessWidget {
     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
 
     return Provide<CurrentIndexProvide>(builder: (context, child, val) {
-      //------------关键代码----------start---------
       int currentIndex =
           Provide.value<CurrentIndexProvide>(context).currentIndex;
-      // ----------关键代码-----------end ----------
       return Scaffold(
         backgroundColor: Color.fromRGBO(244, 245, 245, 1.0),
         bottomNavigationBar: BottomNavigationBar(
@@ -42,9 +40,7 @@ class IndexPage extends StatelessWidget {
           currentIndex: currentIndex,
           items: bottomTabs,
           onTap: (index) {
-            //------------关键代码----------start---------
             Provide.value<CurrentIndexProvide>(context).changeIndex(index);
-            // ----------关键代码-----------end ----------
           },
         ),
         body: IndexedStack(index: currentIndex, children: tabBodies),

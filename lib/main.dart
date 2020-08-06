@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import './pages/index_page.dart';
 import 'package:provide/provide.dart';
-import './provide/counter.dart';
 import './provide/child_category.dart';
 import './provide/category_goods_list.dart';
 import 'package:fluro/fluro.dart';
@@ -12,7 +11,6 @@ import './provide/cart.dart';
 import './provide/currentIndex.dart';
 
 void main() {
-  var counter = Counter();
   var providers = Providers();
   var childCategory = ChildCategory();
   var categoryGoodsListProvide = CategoryGoodsListProvide();
@@ -20,7 +18,6 @@ void main() {
   var cartProvide = CartProvide();
   var currentIndexProvide = CurrentIndexProvide();
   providers
-    ..provide(Provider<Counter>.value(counter))
     ..provide(Provider<ChildCategory>.value(childCategory))
     ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide))
     ..provide(Provider<CartProvide>.value(cartProvide))
