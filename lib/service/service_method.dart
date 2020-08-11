@@ -9,8 +9,7 @@ Future getHomePageContent() async {
     print('开始获取首页数据');
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType =
-        ContentType.parse('application/x-www-form-urlencoded');
+    dio.options.contentType = Headers.formUrlEncodedContentType;
 
     var formData = {'lon': '115.02932', 'lat': '35.76189'};
 
@@ -32,8 +31,7 @@ Future getHomePageBlewContent() async {
     print('开始获取首页火爆专区数据');
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType =
-        ContentType.parse('application/x-www-form-urlencoded');
+    dio.options.contentType = Headers.formUrlEncodedContentType;
 
     int page = 1;
 
@@ -56,8 +54,7 @@ Future request(url, {formData}) async {
     // print(formData.toString());
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType =
-        ContentType.parse('application/x-www-form-urlencoded');
+    dio.options.contentType = Headers.formUrlEncodedContentType;
     if (formData == null) {
       response = await dio.post(
         servicePath[url],
